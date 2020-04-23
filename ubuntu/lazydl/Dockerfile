@@ -16,6 +16,7 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
   curl \
   expect \
   git \
+  make \
   libc6:i386 \
   libgcc1:i386 \
   libncurses5:i386 \
@@ -27,13 +28,15 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
   vim \
   openssh-client \
   locales \
+  nodejs \
+  npm \
   && apt-get clean
 
 RUN  rm -rf /var/lib/apt/lists/* && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ENV LANG en_US.UTF-8
 
-RUN groupadd android && useradd -d /opt/android-sdk-linux -g android -u 1100 android
+RUN groupadd android && useradd -d /opt/android-sdk-linux -g android -u 1000 android
 
 COPY tools /opt/tools
 

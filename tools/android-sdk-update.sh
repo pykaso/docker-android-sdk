@@ -27,7 +27,7 @@ then
     echo "SDK Tools already bootstrapped. Skipping initial setup"
 else
     echo "Bootstrapping SDK-Tools"
-    wget -q http://dl.google.com/android/repository/sdk-tools-linux-3859397.zip -O sdk-tools-linux.zip \
+    wget -q http://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -O sdk-tools-linux.zip \
       && unzip sdk-tools-linux.zip \
       && touch .bootstrapped \
       && rm sdk-tools-linux.zip
@@ -44,16 +44,32 @@ echo "Copying Tools"
 mkdir -p ${ANDROID_HOME}/bin
 cp -v /opt/tools/*.sh ${ANDROID_HOME}/bin
 
+echo "Print sdkmanager version"
+sdkmanager --version
+
+
 echo "Installing packages"
 if [ $built_in_sdk -eq 1 ]
 then
-    while read p; do android-accept-licenses.sh sdkmanager ${SDKMNGR_OPTS} --verbose ${p}; done < /opt/tools/package-list-minimal.txt
+    while read p; do 
+      android-accept-licenses.sh "sdkmanager ${SDKMNGR_OPTS} ${p}"
+    done < /opt/tools/package-list-minimal.txt
 else
-    while read p; do android-accept-licenses.sh sdkmanager ${SDKMNGR_OPTS} --verbose ${p}; done < /opt/tools/package-list.txt
+    while read p; do
+      android-accept-licenses.sh "sdkmanager ${SDKMNGR_OPTS} ${p}"
+    done < /opt/tools/package-list.txt
 fi
 
 echo "Updating SDK"
 update_sdk
 
 echo "Accepting Licenses"
-android-accept-licenses.sh "sdkmanager ${SDKMNGR_OPTS} --licenses --verbose"
+android-accept-licenses.sh "sdkmanager ${SDKMNGR_OPTS} --licenses"
+
+# https://stackoverflow.com/questions/35128229/error-no-toolchains-found-in-the-ndk-toolchains-folder-for-abi-with-prefix-llv
+if [ -d /opt/android-sdk-linux/ndk-bundle/toolchains ]
+then
+    ( cd /opt/android-sdk-linux/ndk-bundle/toolchains \
+    && ln -sf aarch64-linux-android-4.9 mips64el-linux-android \
+    && ln -sf arm-linux-androideabi-4.9 mipsel-linux-android )
+fi

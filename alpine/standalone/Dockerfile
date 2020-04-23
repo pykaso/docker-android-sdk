@@ -1,13 +1,14 @@
-FROM openjdk:8-jdk-alpine
+FROM alpine:latest
 
 LABEL de.mindrunner.android-docker.flavour="alpine-standalone"
 
-ARG GLIBC_VERSION="2.26-r0"
+ARG GLIBC_VERSION="2.28-r0"
 
 ENV ANDROID_SDK_HOME /opt/android-sdk-linux
 ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV ANDROID_SDK /opt/android-sdk-linux
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 
 # Install Required Tools
 RUN apk -U update && apk -U add \
@@ -15,15 +16,22 @@ RUN apk -U update && apk -U add \
   ca-certificates \
   curl \
   expect \
+  fontconfig \
   git \
+  make \
   libstdc++ \
   libgcc \
+  mesa-dev \
+  nodejs \
+  npm \
+  openjdk8 \
+  pulseaudio-dev \
   su-exec \
   ncurses \
   unzip \
   wget \
   zlib \
-  && wget https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub -O /etc/apk/keys/sgerrand.rsa.pub \
+  && wget https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -O /etc/apk/keys/sgerrand.rsa.pub \
 	&& wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk -O /tmp/glibc.apk \
 	&& wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk -O /tmp/glibc-bin.apk \
 	&& apk add /tmp/glibc.apk /tmp/glibc-bin.apk \
@@ -33,7 +41,7 @@ RUN apk -U update && apk -U add \
 # Create android User
 RUN mkdir -p /opt/android-sdk-linux \
   && addgroup android \
-  && adduser android -D -G android -h /opt/android-sdk-linux -u 1100
+  && adduser android -D -G android -h /opt/android-sdk-linux -u 1000
 
 # Copy Tools
 COPY tools /opt/tools
