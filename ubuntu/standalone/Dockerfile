@@ -34,6 +34,20 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
 
 RUN  rm -rf /var/lib/apt/lists/* && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
+
+# Install ag and ld-find-code-refs
+#apt-get install -y software-properties-common && add-apt-repository ppa:pgolm/the-silver-searcher && apt-get update && 
+
+RUN apt-get update -yqq && apt-get install silversearcher-ag
+
+RUN wget -qO- https://api.github.com/repos/launchdarkly/ld-find-code-refs/releases/latest \
+  | grep "browser_download_url" \
+  | grep "amd64.deb" \
+  | cut -d'"' -f4 \
+  | wget -qi - -O ld-find-code-refs.amd64.deb && \
+  dpkg -i ld-find-code-refs.amd64.deb
+
+
 ENV LANG en_US.UTF-8
 
 RUN groupadd android && useradd -d /opt/android-sdk-linux -g android -u 1000 android
